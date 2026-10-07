@@ -16,6 +16,9 @@ def process_job(self, job_id):
 
         time.sleep(5)
 
+        if job.input_data.get("force_failure"):
+            raise Exception("Intentional failure requested for testing")
+
         result = {
             "message": "Job processed successfully",
             "job_id": str(job.id),
@@ -36,6 +39,19 @@ def process_job(self, job_id):
         return result
 
     except Exception as exc:
+        if self.request.retries >= self.max_retries:
+            job.status = Job.Status.FAILURE
+            job.error_message = str(exc)
+            job.save(
+                update_fields=[
+                    "status",
+                    "error_message",
+                    "updated_at",
+                ]
+            )
+
+            raise
+
         job.status = Job.Status.RETRYING
         job.error_message = str(exc)
         job.save(
