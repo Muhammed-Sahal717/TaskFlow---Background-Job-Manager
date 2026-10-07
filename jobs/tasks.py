@@ -1,7 +1,4 @@
-import time
-
 from celery import shared_task
-from django.db import DatabaseError
 
 from .models import Job
 
@@ -15,6 +12,8 @@ def process_job(self, job_id):
         job.save(update_fields=["status", "updated_at"])
 
         # Simulate background work
+        import time
+
         time.sleep(5)
 
         result = {
@@ -24,13 +23,27 @@ def process_job(self, job_id):
 
         job.status = Job.Status.SUCCESS
         job.result_data = result
-        job.save(update_fields=["status", "result_data", "updated_at"])
+        job.error_message = ""
+        job.save(
+            update_fields=[
+                "status",
+                "result_data",
+                "error_message",
+                "updated_at",
+            ]
+        )
 
         return result
 
-    except DatabaseError as exc:
+    except Exception as exc:
         job.status = Job.Status.RETRYING
         job.error_message = str(exc)
-        job.save(update_fields=["status", "error_message", "updated_at"])
+        job.save(
+            update_fields=[
+                "status",
+                "error_message",
+                "updated_at",
+            ]
+        )
 
         raise self.retry(exc=exc, countdown=5)
