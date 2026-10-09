@@ -63,3 +63,7 @@ def process_job(self, job_id):
         )
 
         raise self.retry(exc=exc, countdown=5)
+
+@shared_task
+def scheduled_heartbeat():
+    print("TaskFlow scheduled heartbeat executed!")

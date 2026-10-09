@@ -27,3 +27,8 @@ dist/
 *.swp
 
 db.sqlite3
+
+# Celery Beat
+celerybeat-schedule
+celerybeat-schedule-shm
+celerybeat-schedule-wal
