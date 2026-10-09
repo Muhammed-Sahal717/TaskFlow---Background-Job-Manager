@@ -36,3 +36,12 @@ class Job(models.Model):
 
     def __str__(self):
         return f"{self.job_type} - {self.status}"
+
+
+class ScheduledRun(models.Model):
+    task_name = models.CharField(max_length=100)
+    executed_at = models.DateTimeField(auto_now_add=True)
+    message = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.task_name} - {self.executed_at}"

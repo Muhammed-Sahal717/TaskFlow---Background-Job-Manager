@@ -1,6 +1,6 @@
 from celery import shared_task
 
-from .models import Job
+from .models import Job, ScheduledRun
 
 
 @shared_task(bind=True, max_retries=3)
@@ -64,6 +64,17 @@ def process_job(self, job_id):
 
         raise self.retry(exc=exc, countdown=5)
 
+
 @shared_task
 def scheduled_heartbeat():
-    print("TaskFlow scheduled heartbeat executed!")
+    run = ScheduledRun.objects.create(
+        task_name="scheduled_heartbeat",
+        message="TaskFlow scheduled task executed successfully",
+    )
+
+    print(f"Scheduled run recorded: {run.id}")
+
+    return {
+        "run_id": run.id,
+        "message": run.message,
+    }
