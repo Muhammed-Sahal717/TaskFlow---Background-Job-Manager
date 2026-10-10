@@ -1,3 +1,4 @@
+import time
 from celery import shared_task
 
 from .models import Job, ScheduledRun
@@ -10,9 +11,6 @@ def process_job(self, job_id):
     try:
         job.status = Job.Status.PROCESSING
         job.save(update_fields=["status", "updated_at"])
-
-        # Simulate background work
-        import time
 
         time.sleep(5)
 
