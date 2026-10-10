@@ -1,14 +1,19 @@
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, generics
 from rest_framework.response import Response
 
-from .models import Job
-from .serializers import JobSerializer
+from .models import Job, ScheduledRun
+from .serializers import JobSerializer, ScheduledRunSerializer
 from .tasks import process_job
 
 
 class JobViewSet(viewsets.ModelViewSet):
     queryset = Job.objects.all().order_by("-created_at")
     serializer_class = JobSerializer
+
+    filterset_fields = ["status", "job_type"]
+    search_fields = ["job_type", "error_message"]
+    ordering_fields = ["created_at", "updated_at", "status"]
+    ordering = ["-created_at"]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -29,3 +34,7 @@ class JobViewSet(viewsets.ModelViewSet):
             JobSerializer(job).data,
             status=status.HTTP_202_ACCEPTED,
         )
+
+class ScheduledRunListView(generics.ListAPIView):
+    queryset = ScheduledRun.objects.all().order_by("-executed_at")
+    serializer_class = ScheduledRunSerializer

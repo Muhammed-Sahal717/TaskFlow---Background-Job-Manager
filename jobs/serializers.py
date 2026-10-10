@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Job
+from .models import Job, ScheduledRun
 
 
 class JobSerializer(serializers.ModelSerializer):
@@ -26,3 +26,16 @@ class JobSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+
+
+class ScheduledRunSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScheduledRun
+        fields = [
+            "id",
+            "task_name",
+            "executed_at",
+            "message",
+        ]
+        read_only_fields = fields
