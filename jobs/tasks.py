@@ -8,6 +8,10 @@ from .models import Job, ScheduledRun
 def process_job(self, job_id):
     job = Job.objects.get(id=job_id)
 
+    # If the job has already been processed successfully, return the result data/skip
+    if job.status == Job.Status.SUCCESS:
+        return job.result_data
+
     try:
         job.status = Job.Status.PROCESSING
         job.save(update_fields=["status", "updated_at"])
